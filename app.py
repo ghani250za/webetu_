@@ -1,11 +1,12 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import sqlite3
 import os
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})  # ✅ تمكين CORS لكل المصادر
+app = Flask(__name__, static_folder='static')
+CORS(app, resources={r"/*": {"origins": "*"}})
 
+# ✅ API لتسجيل الدخول
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -22,7 +23,6 @@ def login():
         student = {
             "id": row[0],
             "registration_number": row[1],
-            # "password": row[2],  # ❌ الأفضل حذفه لأسباب أمنية
             "full_name": row[3],
             "department": row[4],
             "year": row[5],
@@ -34,6 +34,18 @@ def login():
     else:
         return jsonify({"error": "Invalid credentials"}), 401
 
+# ✅ عرض index.html عند زيارة /
+@app.route('/')
+def serve_index():
+    return send_from_directory('static', 'index.html')
+
+# ✅ عرض أي ملف ثابت داخل مجلد static/
+@app.route('/<path:path>')
+def serve_static_file(path):
+    return send_from_directory('static', path)
+
+# ✅ تشغيل التطبيق على المنفذ الصحيح
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))  # ✅ حتى يعمل على Render
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
