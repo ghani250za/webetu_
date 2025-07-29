@@ -6,7 +6,6 @@ import os
 app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-# ✅ عرض index.html عند زيارة الرابط الرئيسي
 @app.route('/')
 def index():
     return send_from_directory('static', 'index.html')
@@ -39,5 +38,6 @@ def login():
         return jsonify({"error": "Invalid credentials"}), 401
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))  # Railway يستخدم 8080
+    port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port)
+
